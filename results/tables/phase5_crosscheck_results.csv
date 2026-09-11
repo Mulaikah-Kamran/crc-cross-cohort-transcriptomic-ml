@@ -1,0 +1,5 @@
+strategy,validation_cohort,n_stable_genes,n_genes_comparable,n_concordant_direction,concordance_pct,stable_gene_subset_auc,n_genes_in_auc_model
+de_informed,validation1_geo_pooled,149,149,149,1.0,0.9822,149
+de_informed,validation3_cohortC_clean,149,124,89,0.7177,0.6637,124
+data_driven,validation1_geo_pooled,182,182,168,0.9231,0.9876,182
+data_driven,validation3_cohortC_clean,182,169,144,0.8521,0.7396,169

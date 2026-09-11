@@ -1,0 +1,26 @@
+# Raw data - never commit, always regenerated via scripts/
+data/raw/*
+!data/raw/.gitkeep
+*.parquet
+*.h5
+*.rds
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+*.egg-info/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# OS
+.DS_Store
+
+# Results that are large or regeneratable
+results/figures/*.pdf
+!results/figures/cohortA_audit_synthetic_test_example/*.png

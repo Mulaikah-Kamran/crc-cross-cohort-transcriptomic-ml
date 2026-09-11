@@ -1,0 +1,14 @@
+name: p2.2-crc-r
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - r-base=4.4
+  - bioconductor-summarizedexperiment
+  - bioconductor-fieldeffectcrc      # if not on conda, install via BiocManager inside R (see 00_setup_r_env.R)
+  - bioconductor-tcgabiolinks
+  - bioconductor-geoquery
+  - bioconductor-biomart
+  - r-tidyverse
+  - r-arrow                          # to write parquet files that Python can read directly

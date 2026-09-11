@@ -1,0 +1,10 @@
+strategy,model,best_params,inner_cv_roc_auc,path
+de_informed,elastic_net,"{'clf__C': 0.01, 'clf__l1_ratio': 0.2}",1.0,results/models/frozen_de_informed_elastic_net.joblib
+de_informed,random_forest,"{'clf__max_depth': 3, 'clf__min_samples_leaf': 1, 'clf__n_estimators': 200}",1.0,results/models/frozen_de_informed_random_forest.joblib
+de_informed,xgboost,"{'clf__learning_rate': 0.05, 'clf__max_depth': 3, 'clf__n_estimators': 300}",0.9995535714285714,results/models/frozen_de_informed_xgboost.joblib
+data_driven,elastic_net,"{'clf__C': 0.01, 'clf__l1_ratio': 0.2}",1.0,results/models/frozen_data_driven_elastic_net.joblib
+data_driven,random_forest,"{'clf__max_depth': 3, 'clf__min_samples_leaf': 1, 'clf__n_estimators': 200}",1.0,results/models/frozen_data_driven_random_forest.joblib
+data_driven,xgboost,"{'clf__learning_rate': 0.05, 'clf__max_depth': 3, 'clf__n_estimators': 100}",1.0,results/models/frozen_data_driven_xgboost.joblib
+pathway,elastic_net,"{'clf__C': 1.0, 'clf__l1_ratio': 0.5}",0.9991987179487181,results/models/frozen_pathway_elastic_net.joblib
+pathway,random_forest,"{'clf__max_depth': 5, 'clf__min_samples_leaf': 1, 'clf__n_estimators': 200}",0.9994066104702751,results/models/frozen_pathway_random_forest.joblib
+pathway,xgboost,"{'clf__learning_rate': 0.05, 'clf__max_depth': 3, 'clf__n_estimators': 300}",0.9981016654153301,results/models/frozen_pathway_xgboost.joblib

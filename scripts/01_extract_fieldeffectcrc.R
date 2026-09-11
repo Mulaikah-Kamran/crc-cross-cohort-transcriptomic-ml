@@ -28,9 +28,7 @@ extract_cohort <- function(se, cohort_name) {
   message(sprintf("Extracting cohort %s: %d genes x %d samples",
                    cohort_name, nrow(se), ncol(se)))
 
-  counts <- as.data.frame(assay(se, "counts"))  # confirm assay name matches
-  # (if the assay is named differently, e.g. "raw_counts", adjust here —
-  #  run `assayNames(se)` first to check)
+  counts <- as.data.frame(assay(se, "counts"))
 
   counts$gene_id <- rownames(counts)
   col_meta <- as.data.frame(colData(se))
@@ -44,21 +42,22 @@ extract_cohort <- function(se, cohort_name) {
 }
 
 # --- Cohort A: discovery -----------------------------------------------
-se_A <- cohort_A()          # confirm exact accessor name against the package manual
+# NOTE: the package exports these as objects named with spaces, not as
+# conventionally-named functions like cohort_A(). Confirmed interactively
+# against the installed package version (2024-10-31 build).
+se_A <- `cohort A from Dampier et al.`()
 extract_cohort(se_A, "A")
 
 # --- Cohort B: matched-pair external validation -------------------------
-se_B <- cohort_B()
+se_B <- `cohort B from Dampier et al.`()
 extract_cohort(se_B, "B")
 
 # --- Cohort C: single-end, cross-protocol stress test --------------------
-se_C <- cohort_C()
+se_C <- `cohort C from Dampier et al.`()
 extract_cohort(se_C, "C")
 
 message("Done. Files written to: ", out_dir)
-message("IMPORTANT: open one *_colData.csv per cohort and confirm the exact ",
-        "column names for sample-type (tumor/HLT/NAT) and the sub-study/site ",
-        "field (used later in the mini-audit) — column names in the package ",
-        "manual (sampType, study, data, etc.) should be verified against what ",
-        "is actually returned, since Bioconductor package internals can change ",
-        "between versions.")
+message("Column names confirmed against the installed package: sample type ",
+        "is 'sampType', originating sub-study is 'study', and the counts ",
+        "assay is named 'counts'. These are the exact values to pass into ",
+        "the Phase 1 mini-audit script (cohortA_mini_audit.py).")

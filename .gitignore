@@ -24,3 +24,7 @@ venv/
 # Results that are large or regeneratable
 results/figures/*.pdf
 !results/figures/cohortA_audit_synthetic_test_example/*.png
+
+# TCGAbiolinks downloads its cache here relative to wherever it's run
+GDCdata/
+MANIFEST.txt

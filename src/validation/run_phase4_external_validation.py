@@ -2,9 +2,7 @@
 run_phase4_external_validation.py
 
 Applies all 9 frozen pipelines (from freeze_models.py) to all 4 external
-validation cohorts. This is the actual test the whole project has been
-built toward: do the features selected on TCGA-COAD mean anything on
-data the model has never seen.
+validation cohorts, all now confirmed free of TCGA-origin patients.
 
 Usage
 -----
@@ -42,10 +40,8 @@ def align_to_training_genes(log_expr: pd.DataFrame, train_gene_ids: list,
     aligned = log_expr.reindex(index=train_gene_ids)
     n_present = aligned.notna().any(axis=1).sum()
     coverage = n_present / len(train_gene_ids)
-
     for gene in aligned.index[aligned.isna().all(axis=1)]:
         aligned.loc[gene] = train_gene_means.get(gene, 0.0)
-
     return aligned, coverage
 
 
@@ -65,9 +61,9 @@ COHORT_CONFIGS = [
         "exclude_values": [],
     },
     {
-        "name": "validation3_cohortC_stress_test",
-        "counts": "data/raw/fieldeffectcrc/cohortC_counts.parquet",
-        "coldata": "data/raw/fieldeffectcrc/cohortC_colData.csv",
+        "name": "validation3_cohortC_clean",
+        "counts": "data/raw/fieldeffectcrc/validation3_cohortC_clean_counts.parquet",
+        "coldata": "data/raw/fieldeffectcrc/validation3_cohortC_clean_colData.csv",
         "label_col": "sampType", "positive": "CRC", "negative": "NAT",
         "exclude_values": ["HLT"],
     },

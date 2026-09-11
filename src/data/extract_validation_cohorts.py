@@ -1,25 +1,14 @@
 """
 extract_validation_cohorts.py
 
-Purpose
--------
-Builds the two remaining external validation cohorts from raw data we
-already downloaded in Phase 1, no new downloads needed, just filtering.
+Builds Validation 2 (non-TCGA clinical sites), Validation 4 (Cohort B,
+TCGA-free), and Validation 3 clean (Cohort C, TCGA-free) from raw data
+already downloaded in Phase 1.
 
-Validation 2: the non-TCGA clinical sites (HebeiMU, KoreaAMC, KoreaPNU,
-Mayo) subset of FieldEffectCrc Cohort A. Expected: 38 samples (21 CRC,
-17 NAT), confirmed against the real Cohort A crosstab during the Cohort A
-audit.
-
-Validation 4: FieldEffectCrc Cohort B with ALL TCGA-origin patients
-removed (not just the 3 that technically overlapped with the TCGA-COAD
-discovery cohort - per the locked decision, all 4 are dropped for a
-clean "zero TCGA outside discovery" rule). Expected: 22 samples
-(11 matched patient pairs).
-
-Both expected counts are asserted explicitly - if the real data doesn't
-match, this stops and prints what it actually found rather than silently
-producing a cohort that's a different size than what we designed around.
+Validation 3 correction: the Phase 4 investigation found 135 of Cohort
+C's 195 TCGA-origin patients are literally the same patients as the
+TCGA-COAD discovery cohort - real leakage, not just a confound. Same
+precedent as Cohort B: drop ALL TCGA-origin samples for one clean rule.
 
 Usage
 -----
@@ -62,8 +51,7 @@ def extract_subset(counts_path: str, coldata_path: str, keep_mask_fn,
         print(subset_meta["sampType"].value_counts())
     if n_actual != expected_n:
         print(f"[!] MISMATCH: got {n_actual}, expected {expected_n}. "
-              f"Stop and investigate before using this output - do not assume "
-              f"this is fine just because the script ran without crashing.")
+              f"Stop and investigate before using this output.")
 
     subset_counts.to_parquet(f"{out_dir}/{out_prefix}_counts.parquet")
     subset_meta.to_csv(f"{out_dir}/{out_prefix}_colData.csv", index=False)
@@ -72,12 +60,28 @@ def extract_subset(counts_path: str, coldata_path: str, keep_mask_fn,
     return subset_meta, subset_counts
 
 
+def extract_cohortC_clean(counts_path: str, coldata_path: str, out_dir: str):
+    extract_subset(
+        counts_path=counts_path,
+        coldata_path=coldata_path,
+        keep_mask_fn=lambda df: df["study"] != "TCGA",
+        cohort_role="validation_3_cohortC_clean",
+        expected_n=80,
+        out_prefix="validation3_cohortC_clean",
+        out_dir=out_dir,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cohortA-counts", required=True)
     parser.add_argument("--cohortA-coldata", required=True)
     parser.add_argument("--cohortB-counts", required=True)
     parser.add_argument("--cohortB-coldata", required=True)
+    parser.add_argument("--cohortC-counts", required=False,
+                         default="data/raw/fieldeffectcrc/cohortC_counts.parquet")
+    parser.add_argument("--cohortC-coldata", required=False,
+                         default="data/raw/fieldeffectcrc/cohortC_colData.csv")
     parser.add_argument("--out-dir", required=True)
     args = parser.parse_args()
 
@@ -98,6 +102,12 @@ def main():
         cohort_role="validation_4_cohortB_clean",
         expected_n=22,
         out_prefix="validation4_cohortB_clean",
+        out_dir=args.out_dir,
+    )
+
+    extract_cohortC_clean(
+        counts_path=args.__dict__["cohortC_counts"],
+        coldata_path=args.__dict__["cohortC_coldata"],
         out_dir=args.out_dir,
     )
 

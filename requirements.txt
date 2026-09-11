@@ -18,3 +18,4 @@ plotly>=5.22          # optional, for an interactive PCA/UMAP audit plot
 
 # Gene ID handling (Phase 1, item 3)
 pybiomart>=0.2        # optional cross-check against Ensembl; not required if biomaRt (R) output is reused
+xgboost>=2.0

@@ -6,7 +6,7 @@ Three feature selection strategies are trained on one large discovery cohort, th
 
 ## What the pipeline found
 
-**Feature selection strategy determines whether a signal survives contact with new data.** On TCGA-COAD, the discovery cohort, every strategy looks equally good. Tested against an independent lab's matched-pair cohort, an unsupervised, purely variance-based selection strategy reaches an AUC of 0.72, against 0.66 for a standard differential-expression approach, the same gap showing up consistently across elastic net, random forest, and XGBoost. Choosing a feature selection method is not a minor implementation detail. It is the difference between finding biology and finding an artifact of your training set.
+**Feature selection strategy determines whether a signal survives contact with new data.** On TCGA-COAD, the discovery cohort, every strategy looks equally good. Tested against an independent lab's matched-pair cohort, an unsupervised, purely variance-based selection strategy reaches an AUC of 0.72, against 0.66 for a standard differential-expression approach and 0.64 for pathway-level selection, the same ranking holding consistently across elastic net, random forest, and XGBoost. Choosing a feature selection method is not a minor implementation detail. It is the difference between finding biology and finding an artifact of your training set.
 
 ![External validation ROC curves](results/figures/final/figure1_roc_curves.png)
 

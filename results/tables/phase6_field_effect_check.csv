@@ -1,0 +1,10 @@
+model,mean_predicted_tumor_prob_HLT,mean_predicted_tumor_prob_NAT,mean_predicted_tumor_prob_CRC,gradient_HLT_lt_NAT_lt_CRC
+data_driven_elastic_net,0.529,0.8336,0.888,True
+data_driven_random_forest,0.3668,0.7975,0.8694,True
+data_driven_xgboost,0.22139999270439148,0.7820000052452087,0.8652999997138977,True
+de_informed_elastic_net,0.4724,0.8028,0.8725,True
+de_informed_random_forest,0.2594,0.7713,0.8573,True
+de_informed_xgboost,0.1949000060558319,0.7425000071525574,0.8507999777793884,True
+pathway_elastic_net,0.0207,0.6187,0.738,True
+pathway_random_forest,0.3252,0.684,0.7424,True
+pathway_xgboost,0.15839999914169312,0.7720000147819519,0.8569999933242798,True

@@ -1,0 +1,7 @@
+strategy,marker_category,n_stable_genes,n_overlap,pct_of_stable_genes,hypergeometric_padj,overlap_genes
+de_informed,IMMUNE_LEUKOCYTE,149,0,0.0,,
+de_informed,STROMAL_FIBROBLAST_VASCULAR,149,0,0.0,,
+de_informed,EPITHELIAL,149,0,0.0,,
+data_driven,EPITHELIAL,182,1,0.0055,0.04998410292857463,ENSG00000171431
+data_driven,IMMUNE_LEUKOCYTE,182,1,0.0055,0.07018975263983249,ENSG00000090382
+data_driven,STROMAL_FIBROBLAST_VASCULAR,182,0,0.0,,

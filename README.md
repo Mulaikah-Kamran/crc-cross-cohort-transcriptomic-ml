@@ -1,56 +1,59 @@
-# crc-cross-cohort-transcriptomic-ml
+# Cross-Cohort Transcriptomic Machine Learning in Colorectal Cancer
 
-Bulk RNA-seq machine learning study on colorectal cancer, built around one question that gets skipped more often than it should: when you find genes that separate tumor from normal tissue, do they actually mean something, or did your model just learn to recognize which lab processed the sample?
+Telling a colorectal tumor apart from normal tissue using gene expression is not a hard problem. Dozens of published models clear 95% accuracy on their own test set. The question this project actually asks is harder: when a model finds genes that separate tumor from normal, do those genes mean something biological, or did the model just learn to recognize which lab processed the sample?
 
-## What this project is actually about
+Three feature selection strategies are trained on one large discovery cohort, then tested, completely blind, against four independent validation cohorts collected by different labs, on different sequencing platforms, using different definitions of "normal" tissue. Only one thing is allowed to determine which strategy wins: whether its genes still hold up somewhere else.
 
-Telling colorectal tumor tissue apart from normal tissue using gene expression is not a hard problem. Tumor and normal tissue are wildly different biologically, and plenty of published studies report accuracy north of 95%. That part isn't the contribution here.
+## What the pipeline found
 
-What this project asks instead: if you train a classifier on one cohort and test it on three other cohorts collected by different labs, on different sequencing machines, sometimes even using a different definition of "normal" tissue, which genes still hold up? And which feature-selection method, out of several reasonable choices, actually gives you genes worth trusting rather than an artifact of the cohort you happened to train on?
+**Feature selection strategy determines whether a signal survives contact with new data.** On TCGA-COAD, the discovery cohort, every strategy looks equally good. Tested against an independent lab's matched-pair cohort, an unsupervised, purely variance-based selection strategy reaches an AUC of 0.72, against 0.66 for a standard differential-expression approach, the same gap showing up consistently across elastic net, random forest, and XGBoost. Choosing a feature selection method is not a minor implementation detail. It is the difference between finding biology and finding an artifact of your training set.
 
-This grew directly out of an earlier project (an early-onset vs late-onset CRC classifier) where a dataset that looked great turned out to be picking up cohort and sequencing differences rather than biology. That failure is the whole reason this project is designed the way it is.
+![External validation ROC curves](results/figures/final/figure1_roc_curves.png)
 
-## The short version of the design
+**Two independent statistical methods converged on the same rare cell type.** Bootstrap stability analysis (200 resamples, patient-level, pre-registered thresholds) identified 149 stable genes from the differential-expression strategy and 182 from the data-driven strategy, with only 4 genes in common between them. Yet four of the strongest individual genes across both strategies, OTOP2, BEST4, and CA7 from one method, GUCA2A from the other, are all markers of the same recently characterized cell population: BEST4+ colonocytes, a rare chemosensory cell type making up under 5% of the healthy colon lining. Two statistically unrelated selection processes landed on pieces of the same underlying biology.
 
-- **Discovery cohort:** FieldEffectCrc Cohort A, 834 samples, tumor vs healthy tissue.
-- **Four separate external validation sets**, deliberately chosen to differ from the discovery cohort in different ways: a matched-pair cohort on the same sequencing protocol, a single-end sequencing cohort that stress-tests protocol sensitivity on purpose, TCGA-COAD (which uses adjacent-normal rather than healthy tissue as its baseline), and a pooled cohort from an independent lab.
-- **Three feature-selection strategies** compared head to head: differential-expression-informed, purely data-driven, and pathway-level.
-- Everything is built around patient-level, leakage-safe nested cross-validation. Feature selection never sees the test fold, and the external cohorts are frozen and touched exactly once.
+![Top biomarker genes by strategy](results/figures/final/figure3_biomarkers.png)
 
-The full reasoning behind every one of these choices, including the datasets we considered and rejected, lives in [`docs/P2.2_Project_Design_Specification.md`](docs/P2.2_Project_Design_Specification.md). That document is the single source of truth for scope. If something in the code ever seems to contradict it, the spec wins and the code is wrong.
+**A frozen model, applied to tissue it never trained on, recovers a known clinical phenomenon.** Scoring healthy colon tissue, tumor-adjacent tissue, and tumor tissue with the same classifier produces a clean, monotonic gradient in every one of nine model variants: healthy tissue scores lowest, adjacent tissue sits in between, tumor scores highest. This lines up with field cancerization, the idea that tissue near a tumor is already partway toward becoming one, without the model ever being told to look for it.
 
-## Where things stand right now
+![Field effect across tissue states](results/figures/final/figure2_field_effect.png)
 
-Phase 1 (data acquisition and a mandatory batch-effect audit) is in progress. See [`PHASE1_README.md`](PHASE1_README.md) for exact run instructions. Two things worth knowing:
+## How it's built
 
-1. The R scripts that pull data from Bioconductor, GDC, and GEO have to be run locally with normal internet access. They're written and documented but not yet run against the live data.
-2. The Python analysis scripts (gene ID overlap check, and a PCA/UMAP audit for hidden batch structure in the discovery cohort) have already been built and tested against synthetic data with a deliberately planted batch effect, to confirm they actually catch the failure mode they're meant to catch before they ever touch real data. Figures from that test run are in `results/figures/cohortA_audit_synthetic_test_example/`.
+- **Discovery cohort:** TCGA-COAD, 522 samples, tumor vs. tumor-adjacent normal tissue, repeated 5x5 stratified nested cross-validation with patient-level grouping throughout.
+- **Three feature selection strategies**, compared head to head under identical conditions: differential-expression-informed, purely data-driven (unsupervised variance ranking), and pathway-level (MSigDB Hallmark gene sets).
+- **Four independent validation cohorts**, each frozen and touched exactly once: an independent lab's matched tumor/normal pairs, a set of small multi-institution clinical sites, a cross-protocol single-end sequencing cohort, and a second FieldEffectCrc cohort, each chosen to differ from the discovery cohort in a specific, deliberate way.
+- **Biological interpretation grounded in real literature.** Every top gene's role was checked against published sources rather than assumed, and gene-level direction was confirmed two independent ways (model coefficient and measured fold change) before being reported.
+- One methodological audit along the way is worth naming directly rather than glossing over: a cross-cohort patient overlap was found and corrected mid-analysis, and the correction is documented in full in the design specification below. Catching it is part of what makes the final results trustworthy.
 
-## Repository layout
+The complete methodology, every locked decision, and the full reasoning behind each design choice live in [`docs/P2.2_Project_Design_Specification.md`](docs/P2.2_Project_Design_Specification.md), the single source of truth for this project's scope.
 
-```
-configs/      accession registry and pipeline parameters
-data/         raw data is never committed; see data/README.md
-docs/         the locked project design specification
-notebooks/    exploratory work, kept separate from reusable code
-scripts/      R scripts for pulling data from Bioconductor / GDC / GEO
-src/          Python source code for the actual pipeline
-results/      figures and tables produced by the pipeline
-reports/      write-up drafts
-```
+## Repository structure  scripts/ R scripts for data acquisition (Bioconductor, TCGA, GEO)
+src/data/ Cohort extraction, gene overlap checks, patient-overlap audits
+src/preprocessing/ Leakage-safe preprocessing, cross-validation splitting
+src/feature_selection/ The three feature selection strategies, as scikit-learn transformers
+src/models/ Model configs and the final frozen-model pipeline
+src/validation/ Nested CV harness and external validation runner
+src/analysis/ Stability analysis, enrichment, biomarker and field-effect scripts
+src/figures/ Scripts that regenerate every figure in this README from the result tables
+results/ All output tables, figures, and the nine frozen model files
+docs/ Full project design specification and decision log  
+## Running it
 
-## Setup
+Two environments are needed: R for data acquisition (Bioconductor packages, TCGAbiolinks, GEOquery), Python for everything downstream.
 
 ```bash
-# R side, for data acquisition
+# R environment
 conda env create -f environment-r.yml
 conda activate p2.2-crc-r
 Rscript scripts/00_setup_r_env.R
 
-# Python side, for everything downstream
+# Python environment
 pip install -r requirements.txt
 ```
 
-## Why "cross-cohort" and not just "colorectal cancer classifier"
+From there, the pipeline runs in order: data acquisition (`scripts/`), cohort extraction and validation-set preparation (`src/data/`), the nested cross-validation experiment (`src/validation/run_nested_cv.py`), model freezing (`src/models/freeze_models.py`), external validation (`src/validation/run_phase4_external_validation.py`), and the stability, enrichment, and interpretation analyses (`src/analysis/`). Each script's docstring documents its exact inputs and outputs. Figures regenerate directly from the committed result tables via `src/figures/`.
 
-Because the classifier part is the easy, already-done part. The interesting part, and the part this repo is actually structured to answer, is whether a signal found in one place survives contact with data it has never seen. Most of the design decisions in here exist to make that question answerable honestly rather than to make the accuracy number look good.
+## License
+
+See [`LICENSE`](LICENSE).

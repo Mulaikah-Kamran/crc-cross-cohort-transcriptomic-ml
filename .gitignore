@@ -4,6 +4,7 @@ data/raw/*
 *.parquet
 *.h5
 *.rds
+!results/**/*.parquet
 
 # Python
 __pycache__/

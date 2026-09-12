@@ -7,7 +7,7 @@
 # write a tidy counts matrix + clinical/sample metadata for Python.
 #
 # NOTE: Run this locally with internet access to the GDC API
-# (https://api.gdc.cancer.gov) - not reachable from Claude's sandbox.
+# (https://api.gdc.cancer.gov) - not reachable from this environment.
 # ---------------------------------------------------------------------------
 
 suppressPackageStartupMessages({

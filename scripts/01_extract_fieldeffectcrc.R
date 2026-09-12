@@ -11,7 +11,7 @@
 # This gives Python everything it needs without touching R again.
 #
 # NOTE: Run this locally (or on any machine with internet access to
-# Bioconductor) — it cannot run inside Claude's sandboxed environment,
+# Bioconductor) — it cannot run in this development environment,
 # which does not have network access to Bioconductor's servers.
 # ---------------------------------------------------------------------------
 

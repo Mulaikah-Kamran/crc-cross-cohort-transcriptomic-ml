@@ -8,7 +8,7 @@
 # per Decision #5 in the locked spec.
 #
 # NOTE: Run this locally with internet access to NCBI GEO — not reachable
-# from Claude's sandbox.
+# from this environment.
 #
 # IMPORTANT: GEO series don't always store raw counts in a uniform way.
 # This script downloads the supplementary files and the sample metadata;
